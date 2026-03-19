@@ -8,19 +8,25 @@ def text_score(image):
 
     boxes = pytesseract.image_to_boxes(img)
 
-    if len(boxes) == 0:
+    if not boxes.strip():
         return 2.0  # assume bad if no text detected
 
     heights = []
-    for b in boxes:
-        b = b.split()
-        heights.append(int(b[3]) - int(b[1]))
+    for line in boxes.splitlines():
+        parts = line.split()
+        if len(parts) < 5:  # skip malformed lines
+            continue
+        # b = [char, x1, y1, x2, y2]
+        char, x1, y1, x2, y2 = parts[:5]
+        heights.append(int(y2) - int(y1))
+
+    if not heights:
+        return 2.0  # if no valid boxes
 
     avg_height = np.mean(heights)
 
-    # normalize based on image size
+    # normalize based on image height
     ratio = avg_height / h
-
     score = ratio / 0.03 * 10
     score = min(max(score, 0), 10)
 

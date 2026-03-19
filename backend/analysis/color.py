@@ -8,7 +8,7 @@ def color_score(image):
     contrast = np.std(L)
 
     # normalize to 0–10
-    score = contrast / 25
+    score = contrast / 4
     score = min(max(score, 0), 10)
 
     return round(score, 1)
